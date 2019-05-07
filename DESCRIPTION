@@ -23,3 +23,5 @@ Imports: plyr (>= 1.8.4),
 Suggests: rmarkdown
 RoxygenNote: 6.1.1
 VignetteBuilder: knitr
+URL: http://github.com/camillejo/cpsurvsim
+BugReports: http://github.com/camillejo/cpsurvsim/issues
