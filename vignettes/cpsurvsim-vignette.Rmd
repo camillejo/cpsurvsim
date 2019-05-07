@@ -1,0 +1,82 @@
+---
+title: "Introduction to cpsurvsim"
+author: "Camille J Hochheimer"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to cpsurvsim}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+When using real-life datasets, hazard rates are hardly constant nor do they follow a prescribed distribution. Change-point hazard functions allow researchers to model more complex time-to-event patterns. Functions with more than one change-point allow for additional flexibility. The `cpsurvsim` package allows users to simulate time-to-event data from the exponential (or piecewise constant) hazard function and the weibull hazard function. Two simulation methods are provided: the inverse CDF method and a memoryless method exploiting the memoryless property of survival data. 
+
+
+In survival analysis, the probability that an individual experiences an event at time $t$ is independent of the probability that they experience an event up to that point. The memoryless method of simulation uses that assumption in the sense that the probability an event occurs after a change-point is independent of the probability of an event occuring before the change-point. In this way, data in between change-points are simulated from independent exponential or Weibull hazard distributions with scale parameters $\theta$ corresponding to each time interval. 
+
+
+## Exponential change-point / piecewise constant hazard function
+
+For multiple change-points, the exponential change-point hazard function (also known as the piecewise constant hazard function) for $K$ change-points is 
+
+$\begin{eqnarray}
+	h(t)&=&\begin{cases}
+	\theta_1 & 0\leq t<\tau_1\\
+	\theta_2 & \tau_1\leq t <\tau_2\\
+	\vdots & \vdots \\
+	\theta_{K+1} & t\geq\tau_K
+	\end{cases}
+	\end{eqnarray}$.
+	
+The CDF method implemented in `exp_cdfsim` draws on the work of Walke^[Rainer Walke. Example for a piecewise constant hazard data simulation in R. Max Planck Institute for Demographic Research, 2010. <https://www.demogr.mpg.de/papers/technicalreports/tr-2010-003.pdf>], using the relationship between the CDF and cumulative hazard function, $1-F(t) = \exp(−H(t))$, in order to simulate data. Specifically, we generate values ($x$) from the exponential distribution and substitute them into the inverse hazard function 
+$\begin{eqnarray}
+H^{-1}(x)&=&\begin{cases}
+\frac{x}{\theta_1} & 0\leq x<A\\
+\frac{x-A}{\theta_2}+\tau_1 & A\leq x<A+B\\
+\frac{x-A-B}{\theta_3}+\tau_2 & A+B\leq x <A+B+C\\
+\frac{x-A-B-C}{\theta_4}+\tau_3 & A+B+C\leq x<A+B+C+D\\
+\frac{x-A-B-C-D}{\theta_5}+\tau_4 & x\geq A+B+C+D
+\end{cases}
+\end{eqnarray}$
+
+where $A=\theta_1\tau_1$, $B=\theta_2(\tau_2-\tau_1)$, $C=\theta_3(\tau_3-\tau_2)$, and $D=\theta_4(\tau_4-\tau_3)$ in order to get simulated event times $t$. The function `exp_cdfsim` allows for up to 4 change-points. 
+
+The `exp_memsim` function implements the memoryless method to simulate data for each time interval between change-points from independent exponential distributions, using the inverse CDF function $F^{-1}(u)=(-\log(1-u))/\theta$. This inverse CDF is implemented in the function `exp_icdf`.
+	
+
+## Weibull change-point hazard function
+
+The Weibull change-point hazard function for $K$ change-points is
+
+$\begin{eqnarray}
+	h(t)&=&\begin{cases}
+	\theta_1 t^{\gamma-1} & 0\leq t<\tau_1\\
+	\theta_2 t^{\gamma-1} & \tau_1\leq t<\tau_2 \\
+	\vdots & \vdots \\
+	\theta_{K+1} t^{\gamma-1} & t\geq\tau_K
+	\end{cases}
+	\end{eqnarray}$.
+	
+We derive the inverse hazard function for four change-points as
+
+$\begin{eqnarray}
+H^{-1}(x)&=&\begin{cases}
+(\frac{\gamma}{\theta_1}x)^{1/\gamma} & 0\leq x<A\\
+[\frac{\gamma}{\theta_2}(x-A)+\tau_1^{\gamma}]^{1/\gamma} & A\leq x<A+B\\
+[\frac{\gamma}{\theta_3}(x-A-B)+\tau_2^\gamma]^{1/\gamma} & A+B\leq x<A+B+C\\
+[\frac{\gamma}{\theta_4}(x-A-B-C)+\tau_3^\gamma]^{1/\gamma} & A+B+C\leq x<A+B+C+D\\
+[\frac{\gamma}{\theta_5}(x-A-B-C-D)+\tau_4^\gamma]^{1/\gamma} & 
+x\geq A+B+C+D
+\end{cases}
+\end{eqnarray}$
+
+where $A=\frac{\theta_1}{\gamma}\tau_1^{\gamma}$, $B=\frac{\theta_2}{\gamma}(\tau_2^\gamma-\tau_1^\gamma)$, $C=\frac{\theta_3}{\gamma}(\tau_3^\gamma-\tau_2^\gamma)$, and $D=\frac{\theta_4}{\gamma}(\tau_4^\gamma-\tau_3^\gamma)$. In the function `weib_cdfsim`, we simulate values ($x$) from the exponential distribution and plug them into this function to get simulated event times $t$. `weib_cdfsim` allows for up to 4 change-points. 
+
+The function `weib_memsim` simulates data between change-points from independent Weibull distributions using the inverse CDF function $F^{-1}(u)=(-\gamma/\theta \log(1-u))^{1/\gamma}$. This inverse CDF is implemented in the function `weib_icdf`.
