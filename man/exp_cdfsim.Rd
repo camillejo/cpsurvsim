@@ -2,7 +2,7 @@
 % Please edit documentation in R/expfns.R
 \name{exp_cdfsim}
 \alias{exp_cdfsim}
-\title{Inverse CDF simulation for the exponential distribution}
+\title{Inverse CDF simulation for the exponential change-point hazard distribution}
 \usage{
 exp_cdfsim(theta, n, endtime, tau = NA)
 }
@@ -17,14 +17,19 @@ are censored}
 \item{tau}{Change-point(s) \eqn{\tau}}
 }
 \value{
-Dataset with n participants with a survival time
-and censoring indicator.
+Dataset with n participants including a survival time
+and censoring indicator (0 = censored, 1 = event).
 }
 \description{
-This function simulates data for the exponential change-point hazard function
-by simulating values of the exponential function and substituting them into
-the inverse hazard function. This function allows for up to four
-change-points.
+\code{exp_cdfsim} simulates time-to-event data from the exponential change-point
+hazard distribution by implementing the inverse CDF method.
+}
+\details{
+This function simulates data for the exponential change-point hazard
+distribution with $K$ change-points by simulating values of the exponential
+distribution and substituting them into the inverse hazard function. This
+method applies Type I right censoring at the endtime specified by the user.
+This function allows for up to four change-points.
 }
 \examples{
 nochangepoint <- exp_cdfsim(theta = 0.05, n = 10, endtime = 20)

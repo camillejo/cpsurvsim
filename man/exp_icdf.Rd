@@ -12,22 +12,22 @@ exp_icdf(u, theta)
 \item{theta}{Scale parameter \eqn{\theta}}
 }
 \value{
-If inputs are numeric, output is a value or vector of values
-from the inverse CDF of the exponential function.
+If inputs are numeric, output is a value or a vector of values
+from the inverse CDF of the exponential distribution.
 }
 \description{
-\code{exp_icdf} returns a value from the inverse CDF of the
-exponential function.
+\code{exp_icdf} simulates values from the inverse CDF of the
+exponential distribution.
 }
 \details{
-This function uses the exponential function in the form
-\deqn{f(t)=\theta e^{-\theta t}}
+This function uses the exponential distribution of the form
+\deqn{f(t)=\theta exp(-\theta t)}
 to get the inverse CDF
-\deqn{F^{-1}(u)=(-log(1-u))/\theta.} It can be
+\deqn{F^(-1)(u)=(-log(1-u))/\theta.} It can be
 implemented directly and is also called by the functions
 \code{\link{exp_memsim}} and \code{\link{exp_cdfsim}}.
 }
 \examples{
-simdta <- exp_icdf(u = runif(500), theta = 0.05)
+simdta <- exp_icdf(u = runif(10), theta = 0.05)
 
 }

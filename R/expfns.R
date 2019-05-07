@@ -1,23 +1,23 @@
 #' Inverse CDF for the exponential distribution
 #'
-#' \code{exp_icdf} returns a value from the inverse CDF of the
-#' exponential function.
+#' \code{exp_icdf} simulates values from the inverse CDF of the
+#' exponential distribution.
 #'
-#' This function uses the exponential function in the form
-#' \deqn{f(t)=\theta e^{-\theta t}}
+#' This function uses the exponential distribution of the form
+#' \deqn{f(t)=\theta exp(-\theta t)}
 #' to get the inverse CDF
-#' \deqn{F^{-1}(u)=(-log(1-u))/\theta.} It can be
+#' \deqn{F^(-1)(u)=(-log(1-u))/\theta.} It can be
 #' implemented directly and is also called by the functions
 #' \code{\link{exp_memsim}} and \code{\link{exp_cdfsim}}.
 #'
 #' @param u Numerical value(s) to be converted to exponential variable(s)
 #' @param theta Scale parameter \eqn{\theta}
 #'
-#' @return If inputs are numeric, output is a value or vector of values
-#' from the inverse CDF of the exponential function.
+#' @return If inputs are numeric, output is a value or a vector of values
+#' from the inverse CDF of the exponential distribution.
 #'
 #' @examples
-#' simdta <- exp_icdf(u = runif(500), theta = 0.05)
+#' simdta <- exp_icdf(u = runif(10), theta = 0.05)
 #'
 #' @export
 exp_icdf <- function(u, theta) {
@@ -28,14 +28,15 @@ exp_icdf <- function(u, theta) {
   return(-log(1 - u) / theta)
 }
 
-#' Memoryless simulation for the exponential distribution
+#' Memoryless simulation for the exponential change-point hazard distribution
 #'
-#' \code{exp_memsim} returns a dataset simulated from the exponential
-#' hazard distribution with K change-points.
+#' \code{exp_memsim} simulates time-to-event data from the exponential change-point
+#' hazard distribution by implementing the memoryless method.
 #'
-#' This function simulates data between change-points from independent
-#' exponential distributions using the inverse exponential CDF implemented in
-#' the function \code{exp_icdf}.
+#' This function simulates time-to-event data between $K$ change-points from
+#' independent exponential distributions using the inverse CDF implemented
+#' in \code{exp_icdf}. This method applies Type I right censoring at the endtime
+#' specified by the user.
 #'
 #' @param theta Scale parameter \eqn{\theta}
 #' @param n Sample size
@@ -43,8 +44,8 @@ exp_icdf <- function(u, theta) {
 #' are censored
 #' @param tau Change-point(s) \eqn{\tau}
 #'
-#' @return Dataset with n participants with a survival time
-#' and censoring indicator.
+#' @return Dataset with n participants including a survival time
+#' and censoring indicator (0 = censored, 1 = event).
 #'
 #' @examples
 #' nochangepoint <- exp_memsim(theta = 0.05, n = 10, endtime = 20)
@@ -118,12 +119,16 @@ exp_memsim <- function(theta, n, endtime, tau = NA) {
   }
 }
 
-#' Inverse CDF simulation for the exponential distribution
+#' Inverse CDF simulation for the exponential change-point hazard distribution
 #'
-#' This function simulates data for the exponential change-point hazard function
-#' by simulating values of the exponential function and substituting them into
-#' the inverse hazard function. This function allows for up to four
-#' change-points.
+#' \code{exp_cdfsim} simulates time-to-event data from the exponential change-point
+#' hazard distribution by implementing the inverse CDF method.
+#'
+#' This function simulates data for the exponential change-point hazard
+#' distribution with $K$ change-points by simulating values of the exponential
+#' distribution and substituting them into the inverse hazard function. This
+#' method applies Type I right censoring at the endtime specified by the user.
+#' This function allows for up to four change-points.
 #'
 #' @param theta Scale parameter \eqn{\theta}
 #' @param n Sample size
@@ -131,8 +136,8 @@ exp_memsim <- function(theta, n, endtime, tau = NA) {
 #' are censored
 #' @param tau Change-point(s) \eqn{\tau}
 #'
-#' @return Dataset with n participants with a survival time
-#' and censoring indicator.
+#' @return Dataset with n participants including a survival time
+#' and censoring indicator (0 = censored, 1 = event).
 #'
 #' @examples
 #' nochangepoint <- exp_cdfsim(theta = 0.05, n = 10, endtime = 20)
