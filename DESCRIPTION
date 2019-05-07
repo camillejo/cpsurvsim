@@ -1,11 +1,24 @@
 Package: cpsurvsim
 Type: Package
-Title: What the Package Does (Title Case)
-Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Title: Simulating Survival Data from Change-Point Hazard Distributions
+Version: 1.1.0
+Author: Camille Hochheimer [aut,cre]
+Authors@R: person("Camille", "Hochheimer", 
+    email = "hochheimercj@vcu.edu", role = c("aut", "cre"))
+Maintainer: Camille Hochheimer <hochheimercj@vcu.edu>
+Description: This package allows the user to simulate survival data
+    with type I right censoring using two methods: the inverse CDF
+    method and our proposed memoryless method. The latter method
+    takes advantage of the memoryless property of survival and
+    simulates a separate distribution between change-points. We
+    include two parametric distributions: exponential and Weibull.
+Depends: R(>= 3.5.0)
+License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
+Imports: plyr (>= 1.8.4),
+    knitr (>= 1.21),
+    stats,
+    Hmisc
+Suggests: rmarkdown
+RoxygenNote: 6.1.1
