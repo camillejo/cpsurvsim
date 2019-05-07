@@ -25,7 +25,7 @@ and censoring indicator (0 = censored, 1 = event).
 hazard distribution by implementing the memoryless method.
 }
 \details{
-This function simulates time-to-event data between $K$ change-points from
+This function simulates time-to-event data between \eqn{K} change-points from
 independent exponential distributions using the inverse CDF implemented
 in \code{exp_icdf}. This method applies Type I right censoring at the endtime
 specified by the user.

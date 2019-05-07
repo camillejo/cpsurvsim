@@ -28,10 +28,10 @@ hazard distribution by implementing the inverse CDF method.
 }
 \details{
 This function simulates data from the Weibull change-point hazard distribution
-with $K$ change-points by simulating values of the exponential distribution and
+with \eqn{K} change-points by simulating values of the exponential distribution and
 substituting them into the inverse hazard function. This method applies Type I
 right censoring at the endtime specified by the user. This function allows for
-up to four change-points and $\gamma$ is held constant.
+up to four change-points and \eqn{\gamma} is held constant.
 }
 \examples{
 nochangepoint <- weib_cdfsim(theta = 0.5, gamma = 2, n = 10,

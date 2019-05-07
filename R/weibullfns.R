@@ -37,7 +37,7 @@ weib_icdf <- function(u, theta, gamma) {
 #' \code{weib_memsim} simulates time-to-event data from the Weibull change-point
 #' hazard distribution by implementing the memoryless method.
 #'
-#' This function simulates time-to-event data between $K$ change-points \eqn{\tau}
+#' This function simulates time-to-event data between \eqn{K} change-points \eqn{\tau}
 #' from independent Weibull distributions using the inverse Weibull CDF
 #' implemented in \code{\link{weib_icdf}}. This method applies Type I right
 #' censoring at the endtime specified by the user. \eqn{\gamma} is
@@ -133,10 +133,10 @@ weib_memsim <- function(theta, gamma, n, endtime, tau = NA) {
 #' hazard distribution by implementing the inverse CDF method.
 #'
 #' This function simulates data from the Weibull change-point hazard distribution
-#' with $K$ change-points by simulating values of the exponential distribution and
+#' with \eqn{K} change-points by simulating values of the exponential distribution and
 #' substituting them into the inverse hazard function. This method applies Type I
 #' right censoring at the endtime specified by the user. This function allows for
-#' up to four change-points and $\gamma$ is held constant.
+#' up to four change-points and \eqn{\gamma} is held constant.
 #'
 #' @param theta Scale parameter \eqn{\theta}
 #' @param gamma Shape parameter \eqn{\gamma}

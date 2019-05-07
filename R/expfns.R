@@ -33,7 +33,7 @@ exp_icdf <- function(u, theta) {
 #' \code{exp_memsim} simulates time-to-event data from the exponential change-point
 #' hazard distribution by implementing the memoryless method.
 #'
-#' This function simulates time-to-event data between $K$ change-points from
+#' This function simulates time-to-event data between \eqn{K} change-points from
 #' independent exponential distributions using the inverse CDF implemented
 #' in \code{exp_icdf}. This method applies Type I right censoring at the endtime
 #' specified by the user.
@@ -125,7 +125,7 @@ exp_memsim <- function(theta, n, endtime, tau = NA) {
 #' hazard distribution by implementing the inverse CDF method.
 #'
 #' This function simulates data for the exponential change-point hazard
-#' distribution with $K$ change-points by simulating values of the exponential
+#' distribution with \eqn{K} change-points by simulating values of the exponential
 #' distribution and substituting them into the inverse hazard function. This
 #' method applies Type I right censoring at the endtime specified by the user.
 #' This function allows for up to four change-points.

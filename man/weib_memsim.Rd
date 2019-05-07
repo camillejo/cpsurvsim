@@ -27,7 +27,7 @@ and censoring indicator (0 = censored, 1 = event).
 hazard distribution by implementing the memoryless method.
 }
 \details{
-This function simulates time-to-event data between $K$ change-points \eqn{\tau}
+This function simulates time-to-event data between \eqn{K} change-points \eqn{\tau}
 from independent Weibull distributions using the inverse Weibull CDF
 implemented in \code{\link{weib_icdf}}. This method applies Type I right
 censoring at the endtime specified by the user. \eqn{\gamma} is

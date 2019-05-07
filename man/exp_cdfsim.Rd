@@ -26,7 +26,7 @@ hazard distribution by implementing the inverse CDF method.
 }
 \details{
 This function simulates data for the exponential change-point hazard
-distribution with $K$ change-points by simulating values of the exponential
+distribution with \eqn{K} change-points by simulating values of the exponential
 distribution and substituting them into the inverse hazard function. This
 method applies Type I right censoring at the endtime specified by the user.
 This function allows for up to four change-points.
