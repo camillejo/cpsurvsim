@@ -13,11 +13,7 @@ Description: Simulates time-to-event data
     takes advantage of the memoryless property of survival and
     simulates a separate distribution between change-points. We
     include two parametric distributions: exponential and Weibull.
-Depends: R(>= 3.5.0),
-    plyr (>= 1.8.4),
-    knitr (>= 1.21),
-    stats,
-    Hmisc
+Depends: R(>= 3.5.0)
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
