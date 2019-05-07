@@ -1,12 +1,12 @@
 #' Inverse CDF for the Weibull distribution
 #'
 #' \code{weib_icdf} returns a value from the inverse CDF of the
-#' Weibull function.
+#' Weibull distribution.
 #'
-#' This function uses the Weibull density in the form
-#' \deqn{f(t)=\theta t^{\gamma - 1}exp{-\theta/\gamma t^{\gamma}}}
+#' This function uses the Weibull density of the form
+#' \deqn{f(t)=\theta t^(\gamma - 1)exp(-\theta/\gamma t^(\gamma))}
 #' to get the inverse CDF
-#' \deqn{F^{-1}(u)=(-\gamma/\theta log(1-u))^{1/\gamma}.} It can be
+#' \deqn{F^(-1)(u)=(-\gamma/\theta log(1-u))^(1/\gamma).} It can be
 #' implemented directly and is also called by the functions
 #' \code{\link{weib_memsim}} and \code{\link{weib_cdfsim}}.
 #'
@@ -15,10 +15,10 @@
 #' @param gamma Shape parameter \eqn{\gamma}
 #'
 #' @return Output is a value or vector of values
-#' from the inverse CDF of the Weibull function.
+#' from the inverse CDF of the Weibull distribution.
 #'
 #' @examples
-#' simdta <- weib_icdf(u = runif(500), theta = 0.05, gamma = 2)
+#' simdta <- weib_icdf(u = runif(10), theta = 0.05, gamma = 2)
 #'
 #' @export
 
@@ -32,14 +32,14 @@ weib_icdf <- function(u, theta, gamma) {
 }
 
 
-#' Memoryless simulation for the Weibull distribution
+#' Memoryless simulation for the Weibull change-point hazard distribution
 #'
-#' \code{weib_memsim} returns a dataset simulated from the Weibull
-#' hazard distribution with K change-points.
+#' \code{weib_memsim} simulates time-to-event data from the Weibull change-point
+#' hazard distribution by implementing the memoryless method.
 #'
-#' This function simulates data between change-points \eqn{\tau} from independent
-#' Weibull distributions using the inverse Weibull CDF implemented in
-#' the function \code{\link{weib_icdf}}. This method applies Type I right
+#' This function simulates time-to-event data between $K$ change-points \eqn{\tau}
+#' from independent Weibull distributions using the inverse Weibull CDF
+#' implemented in \code{\link{weib_icdf}}. This method applies Type I right
 #' censoring at the endtime specified by the user. \eqn{\gamma} is
 #' held constant.
 #'
@@ -50,8 +50,8 @@ weib_icdf <- function(u, theta, gamma) {
 #' are censored
 #' @param tau Change-point(s) \eqn{\tau}
 #'
-#' @return Dataset with n participants with a survival time
-#' and censoring indicator.
+#' @return Dataset with n participants including a survival time
+#' and censoring indicator (0 = censored, 1 = event).
 #'
 #' @examples
 #' nochangepoint <- weib_memsim(theta = 0.05, gamma = 2, n = 10,
@@ -127,12 +127,16 @@ weib_memsim <- function(theta, gamma, n, endtime, tau = NA) {
   }
 }
 
-#' Inverse CDF simulation for the Weibull distribution
+#' Inverse CDF simulation for the Weibull change-point hazard distribution
 #'
-#' This function simulates data for the Weibull change-point hazard function
-#' by simulating values of the exponential function and substituting them into
-#' the inverse hazard function. This function allows for up to four
-#' change-points. Gamma is held constant.
+#' \code{weib_cdfsim} simulates time-to-event data from the Weibull change-point
+#' hazard distribution by implementing the inverse CDF method.
+#'
+#' This function simulates data from the Weibull change-point hazard distribution
+#' with $K$ change-points by simulating values of the exponential distribution and
+#' substituting them into the inverse hazard function. This method applies Type I
+#' right censoring at the endtime specified by the user. This function allows for
+#' up to four change-points and $\gamma$ is held constant.
 #'
 #' @param theta Scale parameter \eqn{\theta}
 #' @param gamma Shape parameter \eqn{\gamma}
@@ -141,8 +145,8 @@ weib_memsim <- function(theta, gamma, n, endtime, tau = NA) {
 #' are censored
 #' @param tau Change-point(s) \eqn{\tau}
 #'
-#' @return Dataset with n participants with a survival time
-#' and censoring indicator.
+#' @return Dataset with n participants including a survival time
+#' and censoring indicator (0 = censored, 1 = event).
 #'
 #' @examples
 #' nochangepoint <- weib_cdfsim(theta = 0.5, gamma = 2, n = 10,

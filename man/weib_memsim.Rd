@@ -2,7 +2,7 @@
 % Please edit documentation in R/weibullfns.R
 \name{weib_memsim}
 \alias{weib_memsim}
-\title{Memoryless simulation for the Weibull distribution}
+\title{Memoryless simulation for the Weibull change-point hazard distribution}
 \usage{
 weib_memsim(theta, gamma, n, endtime, tau = NA)
 }
@@ -19,17 +19,17 @@ are censored}
 \item{tau}{Change-point(s) \eqn{\tau}}
 }
 \value{
-Dataset with n participants with a survival time
-and censoring indicator.
+Dataset with n participants including a survival time
+and censoring indicator (0 = censored, 1 = event).
 }
 \description{
-\code{weib_memsim} returns a dataset simulated from the Weibull
-hazard distribution with K change-points.
+\code{weib_memsim} simulates time-to-event data from the Weibull change-point
+hazard distribution by implementing the memoryless method.
 }
 \details{
-This function simulates data between change-points \eqn{\tau} from independent
-Weibull distributions using the inverse Weibull CDF implemented in
-the function \code{\link{weib_icdf}}. This method applies Type I right
+This function simulates time-to-event data between $K$ change-points \eqn{\tau}
+from independent Weibull distributions using the inverse Weibull CDF
+implemented in \code{\link{weib_icdf}}. This method applies Type I right
 censoring at the endtime specified by the user. \eqn{\gamma} is
 held constant.
 }

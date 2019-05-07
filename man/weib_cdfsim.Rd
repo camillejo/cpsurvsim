@@ -2,7 +2,7 @@
 % Please edit documentation in R/weibullfns.R
 \name{weib_cdfsim}
 \alias{weib_cdfsim}
-\title{Inverse CDF simulation for the Weibull distribution}
+\title{Inverse CDF simulation for the Weibull change-point hazard distribution}
 \usage{
 weib_cdfsim(theta, gamma, n, endtime, tau = NA)
 }
@@ -19,14 +19,19 @@ are censored}
 \item{tau}{Change-point(s) \eqn{\tau}}
 }
 \value{
-Dataset with n participants with a survival time
-and censoring indicator.
+Dataset with n participants including a survival time
+and censoring indicator (0 = censored, 1 = event).
 }
 \description{
-This function simulates data for the Weibull change-point hazard function
-by simulating values of the exponential function and substituting them into
-the inverse hazard function. This function allows for up to four
-change-points. Gamma is held constant.
+\code{weib_cdfsim} simulates time-to-event data from the Weibull change-point
+hazard distribution by implementing the inverse CDF method.
+}
+\details{
+This function simulates data from the Weibull change-point hazard distribution
+with $K$ change-points by simulating values of the exponential distribution and
+substituting them into the inverse hazard function. This method applies Type I
+right censoring at the endtime specified by the user. This function allows for
+up to four change-points and $\gamma$ is held constant.
 }
 \examples{
 nochangepoint <- weib_cdfsim(theta = 0.5, gamma = 2, n = 10,
