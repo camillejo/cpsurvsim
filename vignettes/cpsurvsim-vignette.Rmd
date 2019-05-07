@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-When using real-life datasets, hazard rates are hardly constant nor do they follow a prescribed distribution. Change-point hazard functions allow researchers to model more complex time-to-event patterns. Functions with more than one change-point allow for additional flexibility. The `cpsurvsim` package allows users to simulate time-to-event data from the exponential (or piecewise constant) hazard function and the weibull hazard function. Two simulation methods are provided: the inverse CDF method and a memoryless method exploiting the memoryless property of survival data. 
+When using real-life datasets, hazard rates are hardly constant nor do they follow a prescribed distribution. Change-point hazard functions allow researchers to model more complex time-to-event patterns. Functions with more than one change-point allow for additional flexibility. The `cpsurvsim` package allows users to simulate time-to-event data from the exponential (or piecewise constant) hazard function and the Weibull hazard function. Two simulation methods are provided: the inverse CDF method and a memoryless method exploiting the memoryless property of survival data. 
 
 
 In survival analysis, the probability that an individual experiences an event at time $t$ is independent of the probability that they experience an event up to that point. The memoryless method of simulation uses that assumption in the sense that the probability an event occurs after a change-point is independent of the probability of an event occuring before the change-point. In this way, data in between change-points are simulated from independent exponential or Weibull hazard distributions with scale parameters $\theta$ corresponding to each time interval. 
