@@ -26,5 +26,4 @@
 #' @importFrom plyr join_all
 #' @importFrom stats rexp runif
 #' @import knitr
-#' @import rmarkdown
 NULL

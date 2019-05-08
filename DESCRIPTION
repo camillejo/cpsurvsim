@@ -13,14 +13,14 @@ Description: Simulates time-to-event data
     takes advantage of the memoryless property of survival and
     simulates a separate distribution between change-points. We
     include two parametric distributions: exponential and Weibull.
-Depends: R(>= 3.5.0)
+Depends: R (>= 3.5.0)
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
-Imports: plyr (>= 1.8.4),
-    knitr (>= 1.21),
+Imports: plyr (>= 1.8.0),
     stats,
-    Hmisc
+    Hmisc,
+    knitr (>= 1.21)
 Suggests: rmarkdown
 RoxygenNote: 6.1.1
 VignetteBuilder: knitr
