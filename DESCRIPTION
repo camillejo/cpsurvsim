@@ -13,6 +13,7 @@ Description: Simulates time-to-event data
     takes advantage of the memoryless property of survival and
     simulates a separate distribution between change-points. We
     include two parametric distributions: exponential and Weibull.
+    Rainer Walke (2010) <URL:https://www.demogr.mpg.de/papers/technicalreports/tr-2010-003.pdf>
 Depends: R (>= 3.5.0)
 License: GPL (>= 3)
 Encoding: UTF-8
