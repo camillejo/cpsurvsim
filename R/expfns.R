@@ -21,8 +21,8 @@
 #'
 #' @export
 exp_icdf <- function(u, theta) {
-  if(is.numeric(theta) == F | Hmisc::all.is.numeric(u, "test") == F |
-     all(u >= 0) == F | theta <= 0) {
+  if(is.numeric(theta) == FALSE | Hmisc::all.is.numeric(u, "test") == FALSE |
+     all(u >= 0) == FALSE | theta <= 0) {
     stop("All input values must be numeric and >= 0.")
   }
   return(-log(1 - u) / theta)
@@ -58,9 +58,9 @@ exp_icdf <- function(u, theta) {
 
 exp_memsim <- function(theta, n, endtime, tau = NA) {
   # controls for incorrect input
-  if(Hmisc::all.is.numeric(theta, "test") == F |
-     is.numeric(n) == F | is.numeric(endtime)==F |
-     all(theta > 0) == F | n < 1 | endtime <= 0) {
+  if(Hmisc::all.is.numeric(theta, "test") == FALSE |
+     is.numeric(n) == FALSE | is.numeric(endtime)==FALSE |
+     all(theta > 0) == FALSE | n < 1 | endtime <= 0) {
     stop("All input values must be numeric with value >= 0.")
   }
   n <- as.integer(n)
@@ -68,7 +68,7 @@ exp_memsim <- function(theta, n, endtime, tau = NA) {
   time <- NULL
 
   #no change-point
-  if(is.na(tau[1]) == T) {
+  if(is.na(tau[1]) == TRUE) {
     simdta <- data.frame(id = c(1:n))
     x <- stats::runif(n)
     dt <- cpsurvsim::exp_icdf(u = x, theta = theta)
@@ -78,12 +78,12 @@ exp_memsim <- function(theta, n, endtime, tau = NA) {
     return(dta)
   }
   #at least one change-point
-  if(is.na(tau[1]) == F) {
-    if(Hmisc::all.is.numeric(tau, "test") == F | all(tau > 0) == F) {
+  if(is.na(tau[1]) == FALSE) {
+    if(Hmisc::all.is.numeric(tau, "test") == FALSE | all(tau > 0) == FALSE) {
       stop("Tau must be numeric and > 0.")
     }
     if(endtime < tau[length(tau)]) {
-      print("Warning: Change-points occur after endtime.")
+      warning("Warning: Change-points occur after endtime.")
     }
     if(length(theta) != (length(tau)+1)) {
       stop("Length of theta and tau not compatible.")
@@ -150,9 +150,9 @@ exp_memsim <- function(theta, n, endtime, tau = NA) {
 
 exp_cdfsim <- function(theta, n, endtime, tau = NA) {
   # controls for incorrect input
-  if(Hmisc::all.is.numeric(theta, "test") == F |
-     is.numeric(n) == F | is.numeric(endtime)==F |
-     all(theta > 0) == F | n < 1 | endtime <= 0) {
+  if(Hmisc::all.is.numeric(theta, "test") == FALSE |
+     is.numeric(n) == FALSE | is.numeric(endtime)==FALSE |
+     all(theta > 0) == FALSE | n < 1 | endtime <= 0) {
     stop("All input values must be numeric and >= 0.")
   }
   if(length(tau) > 4){
@@ -160,15 +160,15 @@ exp_cdfsim <- function(theta, n, endtime, tau = NA) {
   }
   n <- as.integer(n)
   x <- stats::rexp(n)
-  if(is.na(tau[1]) == T) {
+  if(is.na(tau[1]) == TRUE) {
     t <- x / theta
   }
-  if(is.na(tau[1]) == F) {
-    if(Hmisc::all.is.numeric(tau, "test") == F | all(tau > 0) == F) {
+  if(is.na(tau[1]) == FALSE) {
+    if(Hmisc::all.is.numeric(tau, "test") == FALSE | all(tau > 0) == FALSE) {
       stop("Tau must be numeric and > 0.")
     }
     if(endtime < tau[length(tau)]) {
-      print("Warning: Change-points occur after endtime.")
+      warning("Warning: Change-points occur after endtime.")
     }
     if(length(theta) != (length(tau)+1)) {
       stop("Length of theta and tau not compatible.")

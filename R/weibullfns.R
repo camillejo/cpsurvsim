@@ -23,9 +23,9 @@
 #' @export
 
 weib_icdf <- function(u, theta, gamma) {
-  if(is.numeric(theta) == F | is.numeric(gamma) == F |
-     Hmisc::all.is.numeric(u, "test") == F | theta <= 0 |
-     gamma <= 0 | all(u >= 0) == F) {
+  if(is.numeric(theta) == FALSE | is.numeric(gamma) == FALSE |
+     Hmisc::all.is.numeric(u, "test") == FALSE | theta <= 0 |
+     gamma <= 0 | all(u >= 0) == FALSE) {
     stop("All input values must be numeric and >= 0.")
   }
   return(((-gamma / theta) * log(1 - u)) ^ (1 / gamma))
@@ -65,9 +65,9 @@ weib_icdf <- function(u, theta, gamma) {
 
 weib_memsim <- function(theta, gamma, n, endtime, tau = NA) {
   # controls for incorrect input
-  if(Hmisc::all.is.numeric(theta, "test") == F | is.numeric(gamma) == F |
-     is.numeric(n) == F | is.numeric(endtime)==F |
-     all(theta > 0) == F | gamma <= 0 | n < 1 | endtime <= 0) {
+  if(Hmisc::all.is.numeric(theta, "test") == FALSE | is.numeric(gamma) == FALSE |
+     is.numeric(n) == FALSE | is.numeric(endtime)==FALSE |
+     all(theta > 0) == FALSE | gamma <= 0 | n < 1 | endtime <= 0) {
     stop("All input values must be numeric and >= 0.")
   }
   n <- as.integer(n)
@@ -75,7 +75,7 @@ weib_memsim <- function(theta, gamma, n, endtime, tau = NA) {
   time <- NULL
 
   #no change-point
-  if(is.na(tau[1]) == T) {
+  if(is.na(tau[1]) == TRUE) {
     simdta <- data.frame(id = c(1:n))
     x <- stats::runif(n)
     dt <- cpsurvsim::weib_icdf(u = x, theta = theta, gamma = gamma)
@@ -85,12 +85,12 @@ weib_memsim <- function(theta, gamma, n, endtime, tau = NA) {
     return(dta)
   }
   #at least one change-point
-  if(is.na(tau[1]) == F) {
-    if(Hmisc::all.is.numeric(tau, "test") == F | all(tau > 0) == F) {
+  if(is.na(tau[1]) == FALSE) {
+    if(Hmisc::all.is.numeric(tau, "test") == FALSE | all(tau > 0) == FALSE) {
       stop("Tau must be numeric and > 0.")
     }
     if(endtime < tau[length(tau)]) {
-      print("Warning: Change-points occur after endtime.")
+      warning("Warning: Change-points occur after endtime.")
     }
     if(length(theta) != (length(tau)+1)) {
       stop("Length of theta and tau not compatible.")
@@ -160,9 +160,9 @@ weib_memsim <- function(theta, gamma, n, endtime, tau = NA) {
 
 weib_cdfsim <- function(theta, gamma, n, endtime, tau = NA) {
   # controls for incorrect input
-  if(Hmisc::all.is.numeric(theta, "test") == F | is.numeric(gamma) == F |
-     is.numeric(n) == F | is.numeric(endtime)==F |
-     all(theta > 0) == F | gamma <= 0 | n < 1 | endtime <= 0) {
+  if(Hmisc::all.is.numeric(theta, "test") == FALSE | is.numeric(gamma) == FALSE |
+     is.numeric(n) == FALSE | is.numeric(endtime)==FALSE |
+     all(theta > 0) == FALSE | gamma <= 0 | n < 1 | endtime <= 0) {
     stop("All input values must be numeric and > 0.")
   }
   if(length(tau) > 4){
@@ -170,15 +170,15 @@ weib_cdfsim <- function(theta, gamma, n, endtime, tau = NA) {
   }
   n <- as.integer(n)
   x <- stats::rexp(n)
-  if(is.na(tau[1]) == T) {
+  if(is.na(tau[1]) == TRUE) {
     t <- cpsurvsim::weib_icdf(x, theta = theta, gamma = gamma)
   }
-  if(is.na(tau[1]) == F) {
-    if(Hmisc::all.is.numeric(tau, "test") == F | all(tau > 0) == F) {
+  if(is.na(tau[1]) == FALSE) {
+    if(Hmisc::all.is.numeric(tau, "test") == FALSE | all(tau > 0) == FALSE) {
       stop("Tau must be numeric and > 0.")
     }
     if(endtime < tau[length(tau)]) {
-      print("Warning: Change-points occur after endtime.")
+      warning("Warning: Change-points occur after endtime.")
     }
     if(length(theta) != (length(tau)+1)) {
       stop("Length of theta and tau not compatible.")
