@@ -4,15 +4,15 @@
 \alias{exp_memsim}
 \title{Memoryless simulation for the exponential change-point hazard distribution}
 \usage{
-exp_memsim(theta, n, endtime, tau = NA)
+exp_memsim(n, endtime, theta, tau = NA)
 }
 \arguments{
-\item{theta}{Scale parameter \eqn{\theta}}
-
 \item{n}{Sample size}
 
 \item{endtime}{Maximum study time, point at which all participants
 are censored}
+
+\item{theta}{Scale parameter \eqn{\theta}}
 
 \item{tau}{Change-point(s) \eqn{\tau}}
 }
@@ -31,10 +31,10 @@ in \code{exp_icdf}. This method applies Type I right censoring at the endtime
 specified by the user.
 }
 \examples{
-nochangepoint <- exp_memsim(theta = 0.05, n = 10, endtime = 20)
-onechangepoint <- exp_memsim(theta = c(0.05, 0.01), n = 10,
-  endtime = 20, tau = 10)
-twochangepoints <- exp_memsim(theta = c(0.05, 0.01, 0.05),
-  n = 10, endtime = 20, tau = c(8, 12))
+nochangepoint <- exp_memsim( n = 10, endtime = 20, theta = 0.05)
+onechangepoint <- exp_memsim(n = 10, endtime = 20,
+  theta = c(0.05, 0.01), tau = 10)
+twochangepoints <- exp_memsim(n = 10, endtime = 20,
+  theta = c(0.05, 0.01, 0.05), tau = c(8, 12))
 
 }

@@ -4,17 +4,17 @@
 \alias{weib_memsim}
 \title{Memoryless simulation for the Weibull change-point hazard distribution}
 \usage{
-weib_memsim(theta, gamma, n, endtime, tau = NA)
+weib_memsim(n, endtime, gamma, theta, tau = NA)
 }
 \arguments{
-\item{theta}{Scale parameter \eqn{\theta}}
-
-\item{gamma}{Shape parameter \eqn{\gamma}}
-
 \item{n}{Sample size}
 
 \item{endtime}{Maximum study time, point at which all participants
 are censored}
+
+\item{gamma}{Shape parameter \eqn{\gamma}}
+
+\item{theta}{Scale parameter \eqn{\theta}}
 
 \item{tau}{Change-point(s) \eqn{\tau}}
 }
@@ -34,11 +34,11 @@ censoring at the endtime specified by the user. \eqn{\gamma} is
 held constant.
 }
 \examples{
-nochangepoint <- weib_memsim(theta = 0.05, gamma = 2, n = 10,
-  endtime = 20)
-onechangepoint <- weib_memsim(theta = c(0.05, 0.01), gamma = 2,
-  n = 10, endtime = 20, tau = 10)
-twochangepoints <- weib_memsim(theta = c(0.05, 0.01, 0.05),
-  gamma = 2, n = 10, endtime = 20, tau = c(8, 12))
+nochangepoint <- weib_memsim(n = 10, endtime = 20, gamma = 2,
+  theta = 0.05)
+onechangepoint <- weib_memsim(n = 10, endtime = 20, gamma = 2,
+  theta = c(0.05, 0.01), tau = 10)
+twochangepoints <- weib_memsim(n = 10, endtime = 20, gamma = 2,
+  theta = c(0.05, 0.01, 0.05), tau = c(8, 12))
 
 }

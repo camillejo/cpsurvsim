@@ -1,34 +1,37 @@
-#' Inverse CDF for the Weibull distribution
+#' Inverse CDF value generation for the Weibull distribution
 #'
-#' \code{weib_icdf} returns a value from the inverse CDF of the
-#' Weibull distribution.
+#' \code{weib_icdf} returns a value from the Weibull distribution by
+#' using the inverse CDF.
 #'
 #' This function uses the Weibull density of the form
 #' \deqn{f(t)=\theta t^(\gamma - 1)exp(-\theta/\gamma t^(\gamma))}
 #' to get the inverse CDF
-#' \deqn{F^(-1)(u)=(-\gamma/\theta log(1-u))^(1/\gamma).} It can be
-#' implemented directly and is also called by the functions
-#' \code{\link{weib_memsim}} and \code{\link{weib_cdfsim}}.
+#' \deqn{F^(-1)(u)=(-\gamma/\theta log(1-u))^(1/\gamma)} where \eqn{u}
+#' is a uniform random variable. It can be implemented directly and is
+#' also called by the function \code{\link{weib_memsim}}.
 #'
-#' @param u Numerical value(s) to be converted to Weibull variable(s)
+#' @param n Number of output Weibull values
 #' @param theta Scale parameter \eqn{\theta}
 #' @param gamma Shape parameter \eqn{\gamma}
 #'
 #' @return Output is a value or vector of values
-#' from the inverse CDF of the Weibull distribution.
+#' from the Weibull distribution.
 #'
 #' @examples
-#' simdta <- weib_icdf(u = runif(10), theta = 0.05, gamma = 2)
+#' simdta <- weib_icdf(n = 10, theta = 0.05, gamma = 2)
 #'
 #' @export
 
-weib_icdf <- function(u, theta, gamma) {
-  if(is.numeric(theta) == FALSE | is.numeric(gamma) == FALSE |
-     Hmisc::all.is.numeric(u, "test") == FALSE | theta <= 0 |
-     gamma <= 0 | all(u >= 0) == FALSE) {
-    stop("All input values must be numeric and >= 0.")
+weib_icdf <- function(n, gamma, theta) {
+  if(is.numeric(n) == FALSE | n <= 0) {
+    stop("n must be an integer greater than 0.")
   }
-  return(((-gamma / theta) * log(1 - u)) ^ (1 / gamma))
+  if(is.numeric(theta) == FALSE | is.numeric(gamma) == FALSE |
+     theta <= 0 | gamma <= 0) {
+    stop("Theta and gamma must be numeric and > 0.")
+  }
+  x <- stats::rexp(n)
+  return(((gamma / theta) * x) ^ (1 / gamma))
 }
 
 
@@ -43,32 +46,62 @@ weib_icdf <- function(u, theta, gamma) {
 #' censoring at the endtime specified by the user. \eqn{\gamma} is
 #' held constant.
 #'
-#' @param theta Scale parameter \eqn{\theta}
-#' @param gamma Shape parameter \eqn{\gamma}
 #' @param n Sample size
 #' @param endtime Maximum study time, point at which all participants
 #' are censored
+#' @param gamma Shape parameter \eqn{\gamma}
+#' @param theta Scale parameter \eqn{\theta}
 #' @param tau Change-point(s) \eqn{\tau}
 #'
 #' @return Dataset with n participants including a survival time
 #' and censoring indicator (0 = censored, 1 = event).
 #'
 #' @examples
-#' nochangepoint <- weib_memsim(theta = 0.05, gamma = 2, n = 10,
-#'   endtime = 20)
-#' onechangepoint <- weib_memsim(theta = c(0.05, 0.01), gamma = 2,
-#'   n = 10, endtime = 20, tau = 10)
-#' twochangepoints <- weib_memsim(theta = c(0.05, 0.01, 0.05),
-#'   gamma = 2, n = 10, endtime = 20, tau = c(8, 12))
+#' nochangepoint <- weib_memsim(n = 10, endtime = 20, gamma = 2,
+#'   theta = 0.05)
+#' onechangepoint <- weib_memsim(n = 10, endtime = 20, gamma = 2,
+#'   theta = c(0.05, 0.01), tau = 10)
+#' twochangepoints <- weib_memsim(n = 10, endtime = 20, gamma = 2,
+#'   theta = c(0.05, 0.01, 0.05), tau = c(8, 12))
+#'
+#' # Pay attention to how you parameterize your model!
+#' # This simulates an increasing hazard
+#' set.seed(5738)
+#' increasingHazard <- weib_memsim(n = 100, endtime = 20, gamma = 2,
+#'   theta = c(0.001, 0.005, 0.02), tau = c(8, 12))
+#' # This tries to fit a decreasing hazard, resulting in biased estimates
+#' cp2.nll <- function(par, tau = tau, gamma = gamma, dta = dta){
+#'   theta1 <- par[1]
+#'   theta2 <- par[2]
+#'   theta3 <- par[3]
+#'   ll <- (gamma - 1) * sum(dta$censor * log(dta$time)) +
+#'     log(theta1) * sum((dta$time < tau[1])) +
+#'     log(theta2) * sum((tau[1] <= dta$time) * (dta$time < tau[2])) +
+#'     log(theta3) * sum((dta$time >= tau[2]) * dta$censor) -
+#'     (theta1/gamma) * sum((dta$time^gamma) * (dta$time < tau[1]) +
+#'       (tau[1]^gamma) * (dta$time >= tau[1])) -
+#'     (theta2/gamma) * sum((dta$time^gamma - tau[1]^gamma) *
+#'       (dta$time >= tau[1]) * (dta$time<tau[2]) +
+#'       (tau[2]^gamma - tau[1]^gamma) * (dta$time >= tau[2])) -
+#'     (theta3/gamma) * sum((dta$time^gamma - tau[2]^gamma) *
+#'       (dta$time >= tau[2]))
+#'   return(-ll)
+#' }
+#' optim(par = c(0.2, 0.02, 0.01), fn = cp2.nll,
+#'   tau = c(8, 12), gamma = 2,
+#'   dta = increasingHazard)
 #'
 #' @export
 
-weib_memsim <- function(theta, gamma, n, endtime, tau = NA) {
+weib_memsim <- function(n, endtime, gamma, theta, tau = NA) {
   # controls for incorrect input
+  if(is.numeric(n) == FALSE | n <= 0) {
+    stop("n must be an integer greater than 0.")
+  }
   if(Hmisc::all.is.numeric(theta, "test") == FALSE | is.numeric(gamma) == FALSE |
-     is.numeric(n) == FALSE | is.numeric(endtime)==FALSE |
-     all(theta > 0) == FALSE | gamma <= 0 | n < 1 | endtime <= 0) {
-    stop("All input values must be numeric and >= 0.")
+     all(theta > 0) == FALSE | gamma <= 0 | is.numeric(endtime) == FALSE |
+     endtime <= 0) {
+    stop("Endtime, theta and gamma must be numeric and > 0.")
   }
   n <- as.integer(n)
   id <- NULL
@@ -77,8 +110,7 @@ weib_memsim <- function(theta, gamma, n, endtime, tau = NA) {
   #no change-point
   if(is.na(tau[1]) == TRUE) {
     simdta <- data.frame(id = c(1:n))
-    x <- stats::runif(n)
-    dt <- cpsurvsim::weib_icdf(u = x, theta = theta, gamma = gamma)
+    dt <- cpsurvsim::weib_icdf(n = n, gamma = gamma, theta = theta)
     simdta$time <- ifelse(dt >= endtime, endtime, dt)
     simdta$censor <- ifelse(simdta$time == endtime, 0, 1)
     dta <- data.frame(time = simdta$time, censor = simdta$censor)
@@ -102,17 +134,18 @@ weib_memsim <- function(theta, gamma, n, endtime, tau = NA) {
     phasedta <-list()
     #phase 1
     phasedta[[1]] <- data.frame(id = c(1:n))
-    x1 <- stats::runif(s)
-    dt <- cpsurvsim::weib_icdf(u = x1, theta = theta[1], gamma = gamma)
+    dt <- cpsurvsim::weib_icdf(n = as.numeric(s), gamma = gamma, theta = theta[1])
     phasedta[[1]]$time <- ifelse(dt >= taudiff[1], taudiff[1], dt)
     s <- sum(dt >= taudiff[1])
     #other phases
     for(i in 2:nphases) {
+      if(s == 0){
+        break
+      }
       phasedta[[i]] <- subset(phasedta[[i - 1]],
                               phasedta[[i - 1]]$time >= taudiff[i - 1],
                               select = id)
-      x <- stats::runif(s)
-      p <- cpsurvsim::weib_icdf(u = x, theta = theta[i], gamma = gamma)
+      p <- cpsurvsim::weib_icdf(n = as.numeric(s), gamma = gamma, theta = theta[i])
       phasedta[[i]]$time <- ifelse(p >= taudiff[i], taudiff[i], p)
       s <- sum(phasedta[[i]]$time >= taudiff[i])
       colnames(phasedta[[i]]) <-c ("id", paste0("time", i))
@@ -138,40 +171,70 @@ weib_memsim <- function(theta, gamma, n, endtime, tau = NA) {
 #' right censoring at the endtime specified by the user. This function allows for
 #' up to four change-points and \eqn{\gamma} is held constant.
 #'
-#' @param theta Scale parameter \eqn{\theta}
-#' @param gamma Shape parameter \eqn{\gamma}
 #' @param n Sample size
 #' @param endtime Maximum study time, point at which all participants
 #' are censored
+#' @param gamma Shape parameter \eqn{\gamma}
+#' @param theta Scale parameter \eqn{\theta}
 #' @param tau Change-point(s) \eqn{\tau}
 #'
 #' @return Dataset with n participants including a survival time
 #' and censoring indicator (0 = censored, 1 = event).
 #'
 #' @examples
-#' nochangepoint <- weib_cdfsim(theta = 0.5, gamma = 2, n = 10,
-#'   endtime = 20)
-#' onechangepoint <- weib_cdfsim(theta = c(0.05, 0.01), gamma = 2,
-#'   n = 10, endtime = 20, tau = 10)
-#' twochangepoints <- weib_cdfsim(theta = c(0.05, 0.01, 0.05),
-#'   gamma = 2, n = 10, endtime = 20, tau = c(8, 12))
+#' nochangepoint <- weib_cdfsim(n = 10, endtime = 20, gamma = 2,
+#'   theta = 0.5)
+#' onechangepoint <- weib_cdfsim(n = 10, endtime = 20, gamma = 2,
+#'   theta = c(0.05, 0.01), tau = 10)
+#' twochangepoints <- weib_cdfsim(n = 10, endtime = 20, gamma = 2,
+#'   theta = c(0.05, 0.01, 0.05), tau = c(8, 12))
+#'
+#'#' # Pay attention to how you parameterize your model!
+#' # This simulates an increasing hazard
+#' set.seed(9945)
+#' increasingHazard <- weib_cdfsim(n = 100, endtime = 20, gamma = 2,
+#'   theta = c(0.001, 0.005, 0.02), tau = c(8, 12))
+#' # This tries to fit a decreasing hazard, resulting in biased estimates
+#' cp2.nll <- function(par, tau = tau, gamma = gamma, dta = dta){
+#'   theta1 <- par[1]
+#'   theta2 <- par[2]
+#'   theta3 <- par[3]
+#'   ll <- (gamma - 1) * sum(dta$censor * log(dta$time)) +
+#'     log(theta1) * sum((dta$time < tau[1])) +
+#'     log(theta2) * sum((tau[1] <= dta$time) * (dta$time < tau[2])) +
+#'     log(theta3) * sum((dta$time >= tau[2]) * dta$censor) -
+#'     (theta1/gamma) * sum((dta$time^gamma) * (dta$time < tau[1]) +
+#'       (tau[1]^gamma) * (dta$time >= tau[1])) -
+#'     (theta2/gamma) * sum((dta$time^gamma - tau[1]^gamma) *
+#'       (dta$time >= tau[1]) * (dta$time<tau[2]) +
+#'       (tau[2]^gamma - tau[1]^gamma) * (dta$time >= tau[2])) -
+#'     (theta3/gamma) * sum((dta$time^gamma - tau[2]^gamma) *
+#'       (dta$time >= tau[2]))
+#'   return(-ll)
+#' }
+#' optim(par = c(0.2, 0.02, 0.01), fn = cp2.nll,
+#'   tau = c(8, 12), gamma = 2,
+#'   dta = increasingHazard)
 #'
 #' @export
 
-weib_cdfsim <- function(theta, gamma, n, endtime, tau = NA) {
+weib_cdfsim <- function(n, endtime, gamma, theta, tau = NA) {
   # controls for incorrect input
+  if(is.numeric(n) == FALSE | n <= 0) {
+    stop("n must be an integer greater than 0.")
+  }
   if(Hmisc::all.is.numeric(theta, "test") == FALSE | is.numeric(gamma) == FALSE |
-     is.numeric(n) == FALSE | is.numeric(endtime)==FALSE |
-     all(theta > 0) == FALSE | gamma <= 0 | n < 1 | endtime <= 0) {
-    stop("All input values must be numeric and > 0.")
+     all(theta > 0) == FALSE | gamma <= 0 | is.numeric(endtime) == FALSE |
+     endtime <= 0) {
+    stop("Endtime, theta and gamma must be numeric and > 0.")
   }
   if(length(tau) > 4){
     stop("This function only allows for up to 4 change-points.")
   }
-  n <- as.integer(n)
+  n <- as.numeric(n)
   x <- stats::rexp(n)
   if(is.na(tau[1]) == TRUE) {
-    t <- cpsurvsim::weib_icdf(x, theta = theta, gamma = gamma)
+    t <- ((gamma / theta) * x) ^ (1 / gamma)
   }
   if(is.na(tau[1]) == FALSE) {
     if(Hmisc::all.is.numeric(tau, "test") == FALSE | all(tau > 0) == FALSE) {
@@ -184,7 +247,7 @@ weib_cdfsim <- function(theta, gamma, n, endtime, tau = NA) {
       stop("Length of theta and tau not compatible.")
     }
   }
-  if(length(tau) == 1) {
+  if(length(tau) == 1 & is.na(tau[1]) == FALSE) {
     first <- (theta / gamma) * tau ^ gamma
     cdfcp1 <- function(v) {
       ifelse(v < first, ((gamma / theta[1]) * v) ^ (1 / gamma),
@@ -193,7 +256,7 @@ weib_cdfsim <- function(theta, gamma, n, endtime, tau = NA) {
     t <- cdfcp1(x)
   }
 
-  if(length(tau) == 2) {
+  if(length(tau) == 2 & is.na(tau[1]) == FALSE) {
     first <- (theta[1] / gamma) * tau[1] ^ gamma #set interval 1
     second <- first + (theta[2] / gamma) * (tau[2] ^ gamma - tau[1] ^ gamma) #set interval 2
     cdfcp2 <- function(v) {
@@ -205,7 +268,7 @@ weib_cdfsim <- function(theta, gamma, n, endtime, tau = NA) {
     t <- cdfcp2(x)
   }
 
-  if(length(tau) == 3) {
+  if(length(tau) == 3 & is.na(tau[1]) == FALSE) {
     first <- (theta[1] / gamma) * tau[1] ^ gamma
     second <- first + (theta[2] / gamma) * (tau[2] ^ gamma - tau[1] ^ gamma)
     third <- second + (theta[3] / gamma) * (tau[3] ^ gamma - tau[2] ^ gamma)
@@ -220,7 +283,7 @@ weib_cdfsim <- function(theta, gamma, n, endtime, tau = NA) {
     t <- cdfcp3(x)
   }
 
-  if(length(tau) == 4) {
+  if(length(tau) == 4 & is.na(tau[1]) == FALSE) {
     first <- (theta[1] / gamma) * tau[1] ^ gamma
     second <- first + (theta[2] / gamma) * (tau[2] ^ gamma - tau[1] ^ gamma)
     third <- second + (theta[3] / gamma) * (tau[3] ^ gamma - tau[2] ^ gamma)
@@ -237,7 +300,7 @@ weib_cdfsim <- function(theta, gamma, n, endtime, tau = NA) {
     }
     t <- cdfcp4(x)
   }
-
+  endtime <- as.numeric(endtime)
   C <- rep(endtime, length(x)) #all censored at endtime
   time <- pmin(t, C)  #observed time is min of censored and true
   censor <- as.numeric(time != endtime) #if not endtime then dropout

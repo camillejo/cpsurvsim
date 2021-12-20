@@ -6,26 +6,30 @@
 #' This function uses the exponential distribution of the form
 #' \deqn{f(t)=\theta exp(-\theta t)}
 #' to get the inverse CDF
-#' \deqn{F^(-1)(u)=(-log(1-u))/\theta.} It can be
-#' implemented directly and is also called by the functions
-#' \code{\link{exp_memsim}} and \code{\link{exp_cdfsim}}.
+#' \deqn{F^(-1)(u)=(-log(1-u))/\theta} where \eqn{u}
+#' is a uniform random variable. It can be
+#' implemented directly and is also called by the function
+#' \code{\link{exp_memsim}}.
 #'
-#' @param u Numerical value(s) to be converted to exponential variable(s)
+#' @param n Number of output exponential values
 #' @param theta Scale parameter \eqn{\theta}
 #'
-#' @return If inputs are numeric, output is a value or a vector of values
-#' from the inverse CDF of the exponential distribution.
+#' @return Output is a value or a vector of values
+#' from the exponential distribution.
 #'
 #' @examples
-#' simdta <- exp_icdf(u = runif(10), theta = 0.05)
+#' simdta <- exp_icdf(n = 10, theta = 0.05)
 #'
 #' @export
-exp_icdf <- function(u, theta) {
-  if(is.numeric(theta) == FALSE | Hmisc::all.is.numeric(u, "test") == FALSE |
-     all(u >= 0) == FALSE | theta <= 0) {
-    stop("All input values must be numeric and >= 0.")
+exp_icdf <- function(n, theta) {
+  if(is.numeric(n) == FALSE | n <= 0) {
+    stop("n must be an integer greater than 0.")
   }
-  return(-log(1 - u) / theta)
+  if(is.numeric(theta) == FALSE | theta <= 0) {
+    stop("Theta must be numeric and > 0.")
+  }
+  x <- stats::rexp(n)
+  return(x / theta)
 }
 
 #' Memoryless simulation for the exponential change-point hazard distribution
@@ -38,30 +42,55 @@ exp_icdf <- function(u, theta) {
 #' in \code{exp_icdf}. This method applies Type I right censoring at the endtime
 #' specified by the user.
 #'
-#' @param theta Scale parameter \eqn{\theta}
 #' @param n Sample size
 #' @param endtime Maximum study time, point at which all participants
 #' are censored
+#' @param theta Scale parameter \eqn{\theta}
 #' @param tau Change-point(s) \eqn{\tau}
 #'
 #' @return Dataset with n participants including a survival time
 #' and censoring indicator (0 = censored, 1 = event).
 #'
 #' @examples
-#' nochangepoint <- exp_memsim(theta = 0.05, n = 10, endtime = 20)
-#' onechangepoint <- exp_memsim(theta = c(0.05, 0.01), n = 10,
-#'   endtime = 20, tau = 10)
-#' twochangepoints <- exp_memsim(theta = c(0.05, 0.01, 0.05),
-#'   n = 10, endtime = 20, tau = c(8, 12))
+#' nochangepoint <- exp_memsim( n = 10, endtime = 20, theta = 0.05)
+#' onechangepoint <- exp_memsim(n = 10, endtime = 20,
+#'   theta = c(0.05, 0.01), tau = 10)
+#' twochangepoints <- exp_memsim(n = 10, endtime = 20,
+#'   theta = c(0.05, 0.01, 0.05), tau = c(8, 12))
+#'
+#' # Pay attention to how you parameterize your model!
+#' # This simulates a decreasing hazard
+#' set.seed(1245)
+#' decreasingHazard <- exp_memsim(n = 10, endtime = 20,
+#'   theta = c(0.5, 0.2, 0.01), tau = c(8, 12))
+#' # This tries to fit an increasing hazard, resulting in biased estimates
+#' cp2.nll <- function(par, tau = tau, dta = dta){
+#'   theta1 <- par[1]
+#'   theta2 <- par[2]
+#'   theta3 <- par[3]
+#'   ll <- log(theta1) * sum(dta$time < tau[1])+
+#'         log(theta2) * sum((tau[1] <= dta$time) * (dta$time < tau[2])) +
+#'         log(theta3) * sum((dta$time >= tau[2]) * dta$censor) -
+#'         theta1 * sum(dta$time * (dta$time < tau[1]) +
+#'           tau[1] * (dta$time >= tau[1])) -
+#'         theta2 * sum((dta$time - tau[1]) * (dta$time >= tau[1]) *
+#'           (dta$time < tau[2]) + (tau[2] - tau[1]) * (dta$time >= tau[2])) -
+#'         theta3 * sum((dta$time - tau[2]) * (dta$time >= tau[2]))
+#'   return(-ll)
+#' }
+#' optim(par = c(0.001, 0.1, 0.5), fn = cp2.nll,
+#'       tau = c(8, 12), dta = decreasingHazard)
 #'
 #' @export
 
-exp_memsim <- function(theta, n, endtime, tau = NA) {
+exp_memsim <- function(n, endtime, theta, tau = NA) {
   # controls for incorrect input
-  if(Hmisc::all.is.numeric(theta, "test") == FALSE |
-     is.numeric(n) == FALSE | is.numeric(endtime)==FALSE |
-     all(theta > 0) == FALSE | n < 1 | endtime <= 0) {
-    stop("All input values must be numeric with value >= 0.")
+  if(is.numeric(n) == FALSE | n <= 0) {
+    stop("n must be an integer greater than 0.")
+  }
+  if(Hmisc::all.is.numeric(theta, "test") == FALSE | all(theta > 0) == FALSE |
+     is.numeric(endtime) == FALSE | endtime <= 0) {
+    stop("Endtime and theta must be numeric and > 0.")
   }
   n <- as.integer(n)
   id <- NULL
@@ -70,8 +99,7 @@ exp_memsim <- function(theta, n, endtime, tau = NA) {
   #no change-point
   if(is.na(tau[1]) == TRUE) {
     simdta <- data.frame(id = c(1:n))
-    x <- stats::runif(n)
-    dt <- cpsurvsim::exp_icdf(u = x, theta = theta)
+    dt <- cpsurvsim::exp_icdf(n = n, theta = theta)
     simdta$time <- ifelse(dt >= endtime, endtime, dt)
     simdta$censor <- ifelse(simdta$time == endtime, 0, 1)
     dta <- data.frame(time = simdta$time, censor = simdta$censor)
@@ -95,17 +123,18 @@ exp_memsim <- function(theta, n, endtime, tau = NA) {
     phasedta <-list()
     #phase 1
     phasedta[[1]] <- data.frame(id = c(1:n))
-    x1 <- stats::runif(s)
-    dt <- cpsurvsim::exp_icdf(u = x1, theta = theta[1])
+    dt <- cpsurvsim::exp_icdf(n = s, theta = theta[1])
     phasedta[[1]]$time <- ifelse(dt >= taudiff[1], taudiff[1], dt)
     s <- sum(dt >= taudiff[1])
     #other phases
     for(i in 2:nphases) {
+      if(s == 0){
+        break
+      }
       phasedta[[i]] <- subset(phasedta[[i - 1]],
                               phasedta[[i - 1]]$time >= taudiff[i - 1],
                               select = id)
-      x <- stats::runif(s)
-      p <- cpsurvsim::exp_icdf(u = x, theta = theta[i])
+      p <- cpsurvsim::exp_icdf(n = s, theta = theta[i])
       phasedta[[i]]$time <- ifelse(p >= taudiff[i], taudiff[i], p)
       s <- sum(phasedta[[i]]$time >= taudiff[i])
       colnames(phasedta[[i]]) <-c ("id", paste0("time", i))
@@ -130,30 +159,54 @@ exp_memsim <- function(theta, n, endtime, tau = NA) {
 #' method applies Type I right censoring at the endtime specified by the user.
 #' This function allows for up to four change-points.
 #'
-#' @param theta Scale parameter \eqn{\theta}
 #' @param n Sample size
 #' @param endtime Maximum study time, point at which all participants
 #' are censored
+#' @param theta Scale parameter \eqn{\theta}
 #' @param tau Change-point(s) \eqn{\tau}
 #'
 #' @return Dataset with n participants including a survival time
 #' and censoring indicator (0 = censored, 1 = event).
 #'
 #' @examples
-#' nochangepoint <- exp_cdfsim(theta = 0.05, n = 10, endtime = 20)
-#' onechangepoint <- exp_cdfsim(theta = c(0.05, 0.01), n = 10,
-#'   endtime = 20, tau = 10)
-#' twochangepoints <- exp_cdfsim(theta = c(0.05, 0.01, 0.05),
-#'   n = 10, endtime = 20, tau = c(8, 12))
+#' nochangepoint <- exp_cdfsim(n = 10, endtime = 20, theta = 0.05)
+#' onechangepoint <- exp_cdfsim(n = 10, endtime = 20,
+#'   theta = c(0.05, 0.01), tau = 10)
+#' twochangepoints <- exp_cdfsim(n = 10, endtime = 20,
+#'   theta = c(0.05, 0.01, 0.05), tau = c(8, 12))
 #'
+#' # Pay attention to how you parameterize your model!
+#' # This simulates a decreasing hazard
+#' set.seed(7830)
+#' decreasingHazard <- exp_cdfsim(n = 10, endtime = 20,
+#'   theta = c(0.5, 0.2, 0.01), tau = c(8, 12))
+#' # This tries to fit an increasing hazard, resulting in biased estimates
+#' cp2.nll <- function(par, tau = tau, dta = dta){
+#'   theta1 <- par[1]
+#'   theta2 <- par[2]
+#'   theta3 <- par[3]
+#'   ll <- log(theta1) * sum(dta$time < tau[1])+
+#'         log(theta2) * sum((tau[1] <= dta$time) * (dta$time < tau[2])) +
+#'         log(theta3) * sum((dta$time >= tau[2]) * dta$censor) -
+#'         theta1 * sum(dta$time * (dta$time < tau[1]) +
+#'           tau[1] * (dta$time >= tau[1])) -
+#'         theta2 * sum((dta$time - tau[1]) * (dta$time >= tau[1]) *
+#'           (dta$time < tau[2]) + (tau[2] - tau[1]) * (dta$time >= tau[2])) -
+#'         theta3 * sum((dta$time - tau[2]) * (dta$time >= tau[2]))
+#'   return(-ll)
+#' }
+#' optim(par = c(0.001, 0.1, 0.5), fn = cp2.nll,
+#'       tau = c(8, 12), dta = decreasingHazard)
 #' @export
 
-exp_cdfsim <- function(theta, n, endtime, tau = NA) {
+exp_cdfsim <- function(n, endtime, theta, tau = NA) {
   # controls for incorrect input
-  if(Hmisc::all.is.numeric(theta, "test") == FALSE |
-     is.numeric(n) == FALSE | is.numeric(endtime)==FALSE |
-     all(theta > 0) == FALSE | n < 1 | endtime <= 0) {
-    stop("All input values must be numeric and >= 0.")
+  if(is.numeric(n) == FALSE | n <= 0) {
+    stop("n must be an integer greater than 0.")
+  }
+  if(Hmisc::all.is.numeric(theta, "test") == FALSE | all(theta > 0) == FALSE |
+     is.numeric(endtime) == FALSE | endtime <= 0) {
+    stop("Endtime and theta must be numeric and > 0.")
   }
   if(length(tau) > 4){
     stop("This function only allows for up to 4 change-points.")
@@ -174,14 +227,14 @@ exp_cdfsim <- function(theta, n, endtime, tau = NA) {
       stop("Length of theta and tau not compatible.")
     }
   }
-  if(length(tau) == 1) {
+  if(length(tau) == 1 & is.na(tau[1]) == FALSE) {
     first <- theta[1] * tau
     cdfcp1 <- function(v) {
       ifelse(v < first, v / theta[1] ,((v - first) / theta[2]) + tau)
     }
     t <- cdfcp1(x)
   }
-  if(length(tau) == 2) {
+  if(length(tau) == 2 & is.na(tau[1]) == FALSE) {
     first <- theta[1] * tau[1]
     second <- first + theta[2] * (tau[2] - tau[1])
     cdfcp2 <- function(v) {
@@ -191,7 +244,7 @@ exp_cdfsim <- function(theta, n, endtime, tau = NA) {
     }
     t <- cdfcp2(x)
   }
-  if(length(tau) == 3) {
+  if(length(tau) == 3 & is.na(tau[1]) == FALSE) {
     first <- theta[1] * tau[1]
     second <- first + theta[2] * (tau[2] - tau[1])
     third <- second + theta[3] * (tau[3] - tau[2])
@@ -203,7 +256,7 @@ exp_cdfsim <- function(theta, n, endtime, tau = NA) {
     }
     t <- cdfcp3(x)
   }
-  if(length(tau) == 4) {
+  if(length(tau) == 4 & is.na(tau[1]) == FALSE) {
     first <- theta[1] * tau[1]
     second <- first + theta[2] * (tau[2] - tau[1])
     third <- second + theta[3] * (tau[3] - tau[2])
@@ -217,6 +270,7 @@ exp_cdfsim <- function(theta, n, endtime, tau = NA) {
     }
     t <- cdfcp4(x)
   }
+  endtime <- as.numeric(endtime)
   C <- rep(endtime, length(x)) #all censored at endtime
   time <- pmin(t, C)  #observed time is min of censored and true
   censor <- as.numeric(time != endtime) #if not endtime then dropout

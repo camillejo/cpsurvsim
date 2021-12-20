@@ -4,17 +4,17 @@
 \alias{weib_cdfsim}
 \title{Inverse CDF simulation for the Weibull change-point hazard distribution}
 \usage{
-weib_cdfsim(theta, gamma, n, endtime, tau = NA)
+weib_cdfsim(n, endtime, gamma, theta, tau = NA)
 }
 \arguments{
-\item{theta}{Scale parameter \eqn{\theta}}
-
-\item{gamma}{Shape parameter \eqn{\gamma}}
-
 \item{n}{Sample size}
 
 \item{endtime}{Maximum study time, point at which all participants
 are censored}
+
+\item{gamma}{Shape parameter \eqn{\gamma}}
+
+\item{theta}{Scale parameter \eqn{\theta}}
 
 \item{tau}{Change-point(s) \eqn{\tau}}
 }
@@ -34,11 +34,11 @@ right censoring at the endtime specified by the user. This function allows for
 up to four change-points and \eqn{\gamma} is held constant.
 }
 \examples{
-nochangepoint <- weib_cdfsim(theta = 0.5, gamma = 2, n = 10,
-  endtime = 20)
-onechangepoint <- weib_cdfsim(theta = c(0.05, 0.01), gamma = 2,
-  n = 10, endtime = 20, tau = 10)
-twochangepoints <- weib_cdfsim(theta = c(0.05, 0.01, 0.05),
-  gamma = 2, n = 10, endtime = 20, tau = c(8, 12))
+nochangepoint <- weib_cdfsim(n = 10, endtime = 20, gamma = 2,
+  theta = 0.5)
+onechangepoint <- weib_cdfsim(n = 10, endtime = 20, gamma = 2,
+  theta = c(0.05, 0.01), tau = 10)
+twochangepoints <- weib_cdfsim(n = 10, endtime = 20, gamma = 2,
+  theta = c(0.05, 0.01, 0.05), tau = c(8, 12))
 
 }

@@ -4,15 +4,15 @@
 \alias{exp_cdfsim}
 \title{Inverse CDF simulation for the exponential change-point hazard distribution}
 \usage{
-exp_cdfsim(theta, n, endtime, tau = NA)
+exp_cdfsim(n, endtime, theta, tau = NA)
 }
 \arguments{
-\item{theta}{Scale parameter \eqn{\theta}}
-
 \item{n}{Sample size}
 
 \item{endtime}{Maximum study time, point at which all participants
 are censored}
+
+\item{theta}{Scale parameter \eqn{\theta}}
 
 \item{tau}{Change-point(s) \eqn{\tau}}
 }
@@ -32,10 +32,10 @@ method applies Type I right censoring at the endtime specified by the user.
 This function allows for up to four change-points.
 }
 \examples{
-nochangepoint <- exp_cdfsim(theta = 0.05, n = 10, endtime = 20)
-onechangepoint <- exp_cdfsim(theta = c(0.05, 0.01), n = 10,
-  endtime = 20, tau = 10)
-twochangepoints <- exp_cdfsim(theta = c(0.05, 0.01, 0.05),
-  n = 10, endtime = 20, tau = c(8, 12))
+nochangepoint <- exp_cdfsim(n = 10, endtime = 20, theta = 0.05)
+onechangepoint <- exp_cdfsim(n = 10, endtime = 20,
+  theta = c(0.05, 0.01), tau = 10)
+twochangepoints <- exp_cdfsim(n = 10, endtime = 20,
+  theta = c(0.05, 0.01, 0.05), tau = c(8, 12))
 
 }
