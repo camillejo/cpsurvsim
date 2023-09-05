@@ -1,8 +1,8 @@
 Package: cpsurvsim
 Type: Package
 Title: Simulating Survival Data from Change-Point Hazard Distributions
-Version: 1.2.1
-Date: 2021-12-19
+Version: 1.2.2
+Date: 2023-09-05
 Author: Camille Hochheimer [aut, cre]
 Authors@R: person("Camille", "Hochheimer", 
     email = "dochoch19@gmail.com", role = c("aut", "cre"))
@@ -26,7 +26,7 @@ Imports: plyr (>= 1.8.5),
 Suggests: 
     rmarkdown,
     testthat
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.3
 VignetteBuilder: knitr
 URL: https://github.com/camillejo/cpsurvsim
 BugReports: https://github.com/camillejo/cpsurvsim/issues

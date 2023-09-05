@@ -62,7 +62,7 @@ exp_icdf <- function(n, theta) {
 #' # This simulates a decreasing hazard
 #' set.seed(1245)
 #' decreasingHazard <- exp_memsim(n = 10, endtime = 20,
-#'   theta = c(0.5, 0.2, 0.01), tau = c(8, 12))
+#'   theta = c(0.05, 0.02, 0.01), tau = c(8, 12))
 #' # This tries to fit an increasing hazard, resulting in biased estimates
 #' cp2.nll <- function(par, tau = tau, dta = dta){
 #'   theta1 <- par[1]

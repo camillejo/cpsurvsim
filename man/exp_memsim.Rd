@@ -37,4 +37,27 @@ onechangepoint <- exp_memsim(n = 10, endtime = 20,
 twochangepoints <- exp_memsim(n = 10, endtime = 20,
   theta = c(0.05, 0.01, 0.05), tau = c(8, 12))
 
+# Pay attention to how you parameterize your model!
+# This simulates a decreasing hazard
+set.seed(1245)
+decreasingHazard <- exp_memsim(n = 10, endtime = 20,
+  theta = c(0.05, 0.02, 0.01), tau = c(8, 12))
+# This tries to fit an increasing hazard, resulting in biased estimates
+cp2.nll <- function(par, tau = tau, dta = dta){
+  theta1 <- par[1]
+  theta2 <- par[2]
+  theta3 <- par[3]
+  ll <- log(theta1) * sum(dta$time < tau[1])+
+        log(theta2) * sum((tau[1] <= dta$time) * (dta$time < tau[2])) +
+        log(theta3) * sum((dta$time >= tau[2]) * dta$censor) -
+        theta1 * sum(dta$time * (dta$time < tau[1]) +
+          tau[1] * (dta$time >= tau[1])) -
+        theta2 * sum((dta$time - tau[1]) * (dta$time >= tau[1]) *
+          (dta$time < tau[2]) + (tau[2] - tau[1]) * (dta$time >= tau[2])) -
+        theta3 * sum((dta$time - tau[2]) * (dta$time >= tau[2]))
+  return(-ll)
+}
+optim(par = c(0.001, 0.1, 0.5), fn = cp2.nll,
+      tau = c(8, 12), dta = decreasingHazard)
+
 }

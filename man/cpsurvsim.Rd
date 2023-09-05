@@ -3,6 +3,7 @@
 \docType{package}
 \name{cpsurvsim}
 \alias{cpsurvsim}
+\alias{cpsurvsim-package}
 \title{cpsurvsim: Simulating Survival Data from Change-Point Hazard Distributions}
 \description{
 The cpsurvsim package simulates time-to-event data

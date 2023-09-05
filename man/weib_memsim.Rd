@@ -41,4 +41,31 @@ onechangepoint <- weib_memsim(n = 10, endtime = 20, gamma = 2,
 twochangepoints <- weib_memsim(n = 10, endtime = 20, gamma = 2,
   theta = c(0.05, 0.01, 0.05), tau = c(8, 12))
 
+# Pay attention to how you parameterize your model!
+# This simulates an increasing hazard
+set.seed(5738)
+increasingHazard <- weib_memsim(n = 100, endtime = 20, gamma = 2,
+  theta = c(0.001, 0.005, 0.02), tau = c(8, 12))
+# This tries to fit a decreasing hazard, resulting in biased estimates
+cp2.nll <- function(par, tau = tau, gamma = gamma, dta = dta){
+  theta1 <- par[1]
+  theta2 <- par[2]
+  theta3 <- par[3]
+  ll <- (gamma - 1) * sum(dta$censor * log(dta$time)) +
+    log(theta1) * sum((dta$time < tau[1])) +
+    log(theta2) * sum((tau[1] <= dta$time) * (dta$time < tau[2])) +
+    log(theta3) * sum((dta$time >= tau[2]) * dta$censor) -
+    (theta1/gamma) * sum((dta$time^gamma) * (dta$time < tau[1]) +
+      (tau[1]^gamma) * (dta$time >= tau[1])) -
+    (theta2/gamma) * sum((dta$time^gamma - tau[1]^gamma) *
+      (dta$time >= tau[1]) * (dta$time<tau[2]) +
+      (tau[2]^gamma - tau[1]^gamma) * (dta$time >= tau[2])) -
+    (theta3/gamma) * sum((dta$time^gamma - tau[2]^gamma) *
+      (dta$time >= tau[2]))
+  return(-ll)
+}
+optim(par = c(0.2, 0.02, 0.01), fn = cp2.nll,
+  tau = c(8, 12), gamma = 2,
+  dta = increasingHazard)
+
 }

@@ -20,6 +20,7 @@
 #' methods respectively.
 #'
 #' @docType package
+#' @aliases cpsurvsim-package
 #' @name cpsurvsim
 #'
 #' @importFrom Hmisc all.is.numeric
