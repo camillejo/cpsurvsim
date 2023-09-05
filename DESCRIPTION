@@ -1,7 +1,7 @@
 Package: cpsurvsim
 Type: Package
 Title: Simulating Survival Data from Change-Point Hazard Distributions
-Version: 1.2.2
+Version: 1.2.2.9000
 Date: 2023-09-05
 Author: Camille Hochheimer [aut, cre]
 Authors@R: person("Camille", "Hochheimer", 
