@@ -2,3 +2,5 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^\.git$
+^CRAN-SUBMISSION$
+^cran-comments\.md$
